@@ -8,6 +8,10 @@ import datetime as dt
 # 3rd party
 import curio  # https://github.com/dabeaz/curio
 import curio_http
+import BBb_GPIO # Modified from: https://github.com/rainierez/MatrixKeypad_Python/blob/master/matrix_keypad/BBb_GPIO.py
+
+# SPecific functions and classes
+kp = BBb_GPIO.keypad(columnCount = 3) # Keypad
 
 # Global constants
 GATE_CODE_URL = 'http://private-bbe140-sle1.apiary-mock.com/site/123/gatecodes'
@@ -30,7 +34,14 @@ async def main():
 
 
 async def get_inputs():
-    user_input = input("Please enter your gate code: ")
+    # user_input = input("Please enter your gate code: ")
+    # Not sure how this plays with async quite yet
+    user_input = []
+    print("Please enter your gate code:")
+    for i in range(5):
+        temp_digit = get_digit()    
+        user_input.append(temp_digit)
+        print(user_input)
 
     try:
         user_code = int(user_input) # Makes
@@ -105,6 +116,12 @@ async def fetchpage(url):
     async with curio_http.ClientSession() as session:
         response = await session.get(GATE_CODE_URL)
         return await response.json()
+
+async def get_digit():
+    digit = None
+    while digit == None:
+        digit = kp.getKey()
+    return digit
 
 
 if __name__ == '__main__':
