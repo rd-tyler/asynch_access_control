@@ -53,11 +53,12 @@ async def main():
             break
 
 
+# This may very well require some extensive reworking
 async def get_inputs():
     # user_input = input("Please enter your gate code: ")
-    # Not sure how this plays with async quite yet
     user_input = []
     print("Please enter your gate code:")
+    # lcd.clear()
     # lcd.blink(True)
     # lcd.message("Gate Code:")
     try:
