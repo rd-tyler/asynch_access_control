@@ -10,13 +10,14 @@ import curio  # https://github.com/dabeaz/curio
 import curio_http
 import BBb_GPIO # Modified from: https://github.com/rainierez/MatrixKeypad_Python/blob/master/matrix_keypad/BBb_GPIO.py
 
-# SPecific functions and classes
+# Specific functions and classes
 kp = BBb_GPIO.keypad(columnCount = 3) # Keypad
 
 # Global constants
 GATE_CODE_URL = 'http://private-bbe140-sle1.apiary-mock.com/site/123/gatecodes'
 SLEEP_TIME = 2 * 60 # In seconds 
 SLEEP_TIMEDELTA = dt.timedelta(seconds=SLEEP_TIME)
+MAX_CODE_LEN = 6
 
 
 async def main():
@@ -38,13 +39,22 @@ async def get_inputs():
     # Not sure how this plays with async quite yet
     user_input = []
     print("Please enter your gate code:")
-    for i in range(5):
-        temp_digit = get_digit()    
-        user_input.append(temp_digit)
-        print(user_input)
+    try:
+        init_digit = get_digit()
+        user_input.append(init_digit) 
+        # Once first input is detected waits for remaining inputs
+        if len(user_input) > 0:
+            while len(user_input) < MAX_CODE_LEN:
+                temp_digit = get_digit()
+                user_input.append(temp_digit)
+                print(user_input)
+                sleep(1)
+    except:
+        # Moves on if no input is detected
+        break
 
     try:
-        user_code = int(user_input) # Makes
+        user_code = int(user_input)
         codes = await load_codes()
         print(codes)
         # Checks if access code is in the access list
