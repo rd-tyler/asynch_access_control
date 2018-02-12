@@ -8,7 +8,10 @@ import datetime as dt
 # 3rd party
 import curio  # https://github.com/dabeaz/curio
 import curio_http
+
+# Hardware
 import BBb_GPIO # Modified from: https://github.com/rainierez/MatrixKeypad_Python/blob/master/matrix_keypad/BBb_GPIO.py
+import Adafruit_CharLCD as LCD
 
 # Specific functions and classes
 kp = BBb_GPIO.keypad(columnCount = 3) # Keypad
@@ -19,6 +22,22 @@ SLEEP_TIME = 2 * 60 # In seconds
 SLEEP_TIMEDELTA = dt.timedelta(seconds=SLEEP_TIME)
 MAX_CODE_LEN = 6
 
+# Beaglebone Black pin configuration:
+#lcd pin
+lcd_rs = "P8_8"
+lcd_en = "P8_10"
+lcd_d4 = "P8_18"
+lcd_d5 = "P8_16"
+lcd_d6 = "P8_14"
+lcd_d7 = "P8_12"
+lcd_backlight = "" # Needs assignment
+
+# LCD column and row config
+lcd_columns = 16
+lcd_rows = 2
+
+# Initialize LCD
+lcd = LCD.Adafruit_CharLCD(lcd_rs, lcd_en, lcd_d4, lcd_d5, lcd_d6, lcd_d7, lcd_columns, lcd_rows, lcd_backlight)
 
 async def main():
     now = dt.datetime.now()
@@ -39,6 +58,8 @@ async def get_inputs():
     # Not sure how this plays with async quite yet
     user_input = []
     print("Please enter your gate code:")
+    # lcd.blink(True)
+    # lcd.message("Gate Code:")
     try:
         init_digit = get_digit()
         user_input.append(init_digit) 
@@ -48,6 +69,7 @@ async def get_inputs():
                 temp_digit = get_digit()
                 user_input.append(temp_digit)
                 print(user_input)
+                # lcd.message(user_input)
                 sleep(1)
     except:
         # Moves on if no input is detected
